@@ -75,16 +75,16 @@ class ChessBoard:
         '''
         c = 0
         for row in reversed(range(0,8)):
-            # for every row it checks whether the corresponding column has a piece on it
-            squarechar = ':'
-            if c % 2 == 0:
-                squerechar = '.'
             print('+---'*8 + '+')
+            # for every row it checks whether the corresponding column has a piece on it
             for column in self.board.keys():
+                squarechar = ':'
+                if c % 2 != 0:
+                    squarechar = '.'
                 piecechar = squarechar
                 if self.board[column][row] != '':
                     piecechar = self.board[column][row]
-                print('|' + squarechar + piecechar + squerechar , end='')
+                print('|' + squarechar + piecechar + squarechar , end='')
                 c = c + 1
             print('|')
         print('+---' * 8 + '+')

@@ -2,15 +2,9 @@ from flask import Flask
 from flask import jsonify
 
 app = Flask(__name__)
-### routes
-@app.route('/')
-def index():
-    return 'Index Page'
 
-@app.route('/books')
-def books():
-    # Use a breakpoint in the code line below to debug your script.
-    dbooks = [
+
+dbooks = [
         {
             'id': 0,
             'title': 'A Fire Upon the Deep',
@@ -32,9 +26,28 @@ def books():
             'first_sentence': 'to wound the autumnal city.',
             'published': '1975'
         }
-    ]
+]
+
+def get_book(key='id', value=1):
+    for book in dbooks:
+        got = book.get(key, None)
+        if  got is not None and got == value:
+            return book
+    return {}
+
+## routes
+@app.route('/')
+def index():
+    return 'Index Page'
+
+@app.route('/books')
+def books():
+    # Use a breakpoint in the code line below to debug your script.
     print('Books')
     print(jsonify(dbooks))
     print()
     return jsonify(dbooks)
-    #print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+
+@app.route('/book/<book_id>')
+def book(book_id):
+    return jsonify(get_book(key='id', value=int(book_id)))

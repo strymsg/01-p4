@@ -1,0 +1,101 @@
+swagger: "2.0"
+info:
+  description: "books api test"
+  version: "1.0.0"
+  title: "books api test"
+  contact:
+    email: "Rodrigo.Garcia@jala-foundation.org"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost"
+basePath: "/v2"
+tags:
+- name: "book"
+  description: "Books"
+  externalDocs:
+    description: "check"
+    url: "http://localhost:5000"
+schemes:
+- "https"
+- "http"
+paths:
+  /books:
+    get:
+      tags:
+      - "book"
+      summary: "Get all books"
+      description: "Get the list of all books"
+      operationId: "Get all books"
+      produces: 
+      - "application/json"
+      responses:
+        "200":
+          description: "Get all books"
+  /books/{bookId}:
+    get:
+      tags:
+      - "book"
+      summary: "Find book by id"
+      description: "Find the book by its id, if it does not exists returns an empty json"
+      operationId: "findBookById"
+      parameters:
+      - name: "bookId"
+        in: "path"
+        description: "ID of book to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        "200":
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Book"
+        "400":
+          description: "Invalid ID supplied"
+        "404":
+          description: "Book not found"
+      security:
+      - api_key: []
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+definitions:
+  Book:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      title:
+        type: "string"
+        example: "A Fire Upon the Deep"
+      author:
+        type: "string"
+        example: "Vernor Vinge"
+      first_sentence:
+        type: "string"
+        example: "The coldsleep"
+      published:
+        type: "string"
+        example: "1973"
+    xml:
+      name: "Book"
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

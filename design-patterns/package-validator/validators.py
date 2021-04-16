@@ -150,7 +150,7 @@ class JsonFileValidator(AbstractFileValidator):
             self.mandatory_fields fields
             :return: Error stack
             '''
-        if not path.exists(self.module_name):
+        if not path.exists(path.join(self.module_name, self.extension)):
             self.handle_error(f'Python file {self.module_name} does not exist')
             return
 

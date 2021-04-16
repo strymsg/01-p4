@@ -3,9 +3,15 @@ from abc import ABC, abstractmethod
 import os
 from os import path
 import re
+import py_compile
+import json
 from error_handlers import ValidatorError, ErrorStack
 
 class AbstractValidator:
+    '''
+    Abstract File Validator Class, contains basic attributes and methods
+    to be implemented.
+    '''
     def __init__(self, module_name, mandatory=True):
         self.module_name = module_name
         self.mandatory = mandatory
@@ -26,7 +32,11 @@ class AbstractValidator:
             validation_error.show()
 
 class PathValidator(AbstractValidator):
-    def __init__(self, regex='', type='folder'):
+    def __init__(self, module_name, mandatory=True,
+                 regex='', type='folder'):
+        self.module_name = module_name
+        self.mandatory = mandatory
+        self.error_stack = ErrorStack()
         self.regex = regex
         self.type = type
         self.error = None # initialize empty
@@ -40,6 +50,7 @@ class PathValidator(AbstractValidator):
         '''
         if not path.exists(self.module_name):
             self.handle_error(f'Path {self.module_name} does not exist')
+            return
 
         if self.regex != '':
             regex = re.compile(self.regex)
@@ -53,13 +64,102 @@ class PathValidator(AbstractValidator):
                     if matches is True:
                         break
                 if matches is False:
-                    super().add_error(
-                        f'Path {self.module_name} does not matches regex {self.regex}')
+                    self.handle_error(
+                        f'Path {self.module_name} does not matches regex {self.regex}'
+                    )
             except Exception as E:
                 super().add_error(f'Error finding path {path}', E)
 
-    def handle_error(self, message):
-        super().add_error(f'Path {self.module_name} does not exist')
+    def handle_error(self, message, exception=None):
+        super().add_error(message, exception)
 
 class AbstractFileValidator(AbstractValidator):
-    def __init__(self, extension):
+    def __init__(self, module_name, extension,
+                 mandatory=True):
+        self.module_name = module_name
+        self.mandatory = mandatory
+        self.error_stack = ErrorStack()
+        self.extension = extension
+
+    @abstractmethod
+    def validate(self):
+        pass
+
+    @abstractmethod
+    def handle_error(self, message, exception):
+        pass
+
+class PythonFileValidator(AbstractFileValidator):
+    def __init__(self, module_name, version='3', mandatory=True):
+        self.module_name = module_name
+        self.mandatory = mandatory
+        self.error_stack = ErrorStack()
+        self.extension = 'py'
+        self.version = version
+
+    def validate(self):
+        '''
+        Validates if the python file exists, if not or if an exception
+        was generated it adds to the error stack
+        TODO: Add validation of self.version
+        :return: Error stack
+        '''
+        if not path.exists(self.module_name):
+            self.handle_error(f'Python file {self.module_name} does not exist')
+            return
+        try:
+            py_compile(self.module_name)
+        except Exception as E:
+            self.handle_error(f'python file {self.module_name} caused exception',
+                              E)
+
+    def handle_error(self, message, exception=None):
+        '''
+        Adds the error to the error Stack
+        :param message(string): error message
+        :param exception: Exception if generated
+        :return: None
+        '''
+        super().add_error(message, exception)
+
+class JsonFileValidator(AbstractFileValidator):
+    def __init__(self, module_name, mandatory_fields=[],
+                     mandatory=True):
+        self.module_name = module_name
+        self.mandatory = mandatory
+        self.error_stack = ErrorStack()
+        self.extension = 'json'
+        self.mandatory_fields = mandatory_fields
+
+    def handle_error(self, message, exception):
+        '''Adds the error to the error Stack
+         :param message(string): error message
+        :param exception: Exception if generated
+        :return: None            '''
+        super().add_error(message, exception)
+
+    def validate(self):
+        '''
+        Validates if the self.module_name exists and if it is a valid
+        json file, also checks if the json file contains the
+            self.mandatory_fields fields
+            :return: Error stack
+            '''
+        if not path.exists(self.module_name):
+            self.handle_error(f'Python file {self.module_name} does not exist')
+            return
+
+        try:
+            f = open(self.module_name)
+            data = json.load(f)
+            for field in self.mandatory_fields:
+                if field not in data:
+                    self.handle_error(
+                        f'"{field}" not found in file {self.module_name}'
+                    )
+            return self.error_stack
+
+        except Exception as E:
+            self.handle_error(
+                f'Error opening Javascript file {self.module_name}',
+                E)

@@ -14,6 +14,13 @@ class ValidatorError:
         self.message = message
         self.exception = exception
 
+    def show(self):
+        if self.message == '':
+            return
+        print(f'Type: {self.errtype}')
+        print(f'Message:\n {self.message}')
+        print(f'Exception:\n {str(self.exception)}')
+        print()
 
 class ErrorStack:
     def __init__(self, stack=[]):
@@ -21,3 +28,7 @@ class ErrorStack:
 
     def add_error(self, validation_error: ValidatorError):
         self.stack.append(validation_error)
+
+    def show_errors(self):
+        for error in reversed(self.stack):
+            error.show()

@@ -46,11 +46,15 @@ class PathValidator(AbstractValidator):
         '''
         Validates if the path exists. If self.regex exists it
         check if some directory matches
-        :return:
+        :return: Error stack
         '''
         if not path.exists(self.module_name):
             self.handle_error(f'Path {self.module_name} does not exist')
-            return
+            return self.error_stack
+
+        if not path.isdir(self.module_name):
+            self.handle_error(f'{self.module_name} is not a directory')
+            return self.error_stack
 
         if self.regex != '':
             regex = re.compile(self.regex)
@@ -68,7 +72,8 @@ class PathValidator(AbstractValidator):
                         f'Path {self.module_name} does not matches regex {self.regex}'
                     )
             except Exception as E:
-                super().add_error(f'Error finding path {path}', E)
+                self.handle_error(f'Error finding path {path}', E)
+                return self.error_stack
 
     def handle_error(self, message, exception=None):
         super().add_error(message, exception)

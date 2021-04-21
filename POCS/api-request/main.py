@@ -45,8 +45,7 @@ if __name__ == '__main__':
         except HTTPError as http_err:
             print(f'HTTP Error ocurred: {http_err}')
 
-
-        print('HTTP Methods')
+        print('HTTP Methods with body')
         try:
             print('POST')
             response = requests.post('https://httpbin.org/post', data={'key': 'value'})
@@ -62,11 +61,16 @@ if __name__ == '__main__':
             print('PUT')
             response = requests.put('https://httpbin.org/put', data={'key': 'value'})
             print(response.json())
-            requests.delete('https://httpbin.org/delete')
-            requests.head('https://httpbin.org/get')
-            requests.patch('https://httpbin.org/patch', data={'key': 'value'})
-            requests.options('https://httpbin.org/get')
         except HTTPError as http_err:
             print(f'HTTP Error ocurred: {http_err}')
 
-        # TODO: Auth
+        print("HMore Http pethods")
+        try:
+            requests.delete('https://httpbin.org/delete')
+            requests.head('htt  ps://httpbin.org/get')
+            requests.patch('https://httpbin.org/patch', data={'key': 'value'})
+            requests.options('https://httpbin.org/get')
+        except HTTPError as http_err:
+            print(f"HTTP Error ocurred: {http_err}")
+
+        # TODO: Authentication

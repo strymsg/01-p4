@@ -1,3 +1,5 @@
+# main guide https://github.com/strymsg/01-p4/tree/master/POCS/redis
+
 import redis
 
 if __name__ == '__main__':

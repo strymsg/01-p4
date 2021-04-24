@@ -7,3 +7,6 @@ class RedisConnector:
         except Exception as err:
             print(err)
             raise err
+
+    def get_connection(self):
+        return self.connection

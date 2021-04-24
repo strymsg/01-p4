@@ -22,7 +22,7 @@ virtualenv --python=python3 venv
 
 pip install redis
 
-## now run the test program
-python main.py
+## now run the tests using unittest
+python -m unittest
 ```
 
